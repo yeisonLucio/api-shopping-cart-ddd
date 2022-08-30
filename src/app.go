@@ -1,7 +1,7 @@
 package src
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/yeisonLucio/shopping-cart/src/config"
 )
 
@@ -10,9 +10,10 @@ type App struct {
 }
 
 func (a *App) Start() {
-	app := fiber.New()
+	app := gin.New()
 	a.Routes.SetRoutes(app)
-	app.Listen(":" + config.App.ServerPort)
+	app.Run(":" + config.App.ServerPort)
+	app.Use(gin.Logger())
 }
 
 func NewApp(routes *Routes) *App {

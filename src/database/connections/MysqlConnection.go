@@ -7,6 +7,7 @@ import (
 	"github.com/yeisonLucio/shopping-cart/src/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -22,7 +23,13 @@ func CreateConnection() {
 		config.App.MysqlDbName,
 	)
 
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	gormConfig := &gorm.Config{}
+
+	if !config.App.EnableGormLog {
+		gormConfig.Logger = logger.Default.LogMode(logger.Silent)
+	}
+
+	DB, err = gorm.Open(mysql.Open(dsn), gormConfig)
 	if err != nil {
 		log.Fatal(err)
 	} else {

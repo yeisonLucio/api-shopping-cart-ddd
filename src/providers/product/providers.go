@@ -3,7 +3,7 @@ package product
 import (
 	"github.com/yeisonLucio/shopping-cart/src/components/products/application/use_cases"
 	"github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure"
-	"github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure/routes"
+	product_routes "github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure/routes"
 )
 
 func CreateProductProvider(
@@ -58,6 +58,6 @@ func ProductControllerProvider(
 
 func ProductRoutesProvider(
 	productController *infrastructure.ProductController,
-) *routes.ProductRoutesV1_0 {
-	return routes.NewProductRoutesV1_0(productController)
+) *product_routes.ProductRoutesV1_0 {
+	return product_routes.NewProductRoutesV1_0(productController)
 }

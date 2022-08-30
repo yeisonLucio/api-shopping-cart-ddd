@@ -1,4 +1,4 @@
-package orm
+package product_orm
 
 import (
 	"encoding/json"
@@ -21,4 +21,8 @@ func (p *Product) Parse(structure interface{}) error {
 	}
 
 	return json.Unmarshal(data, &structure)
+}
+
+func (Product) TableName() string {
+	return "products"
 }

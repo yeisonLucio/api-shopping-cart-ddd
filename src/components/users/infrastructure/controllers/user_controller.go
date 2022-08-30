@@ -1,44 +1,71 @@
 package controllers
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/yeisonLucio/shopping-cart/src/components/users/domain"
-	"github.com/yeisonLucio/shopping-cart/src/components/users/domain/contracts/repositories"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	user_domain "github.com/yeisonLucio/shopping-cart/src/components/users/domain"
+	user_repositories "github.com/yeisonLucio/shopping-cart/src/components/users/domain/contracts/repositories"
 )
 
 type UserController struct {
-	UserRepo repositories.UserRepository
+	UserRepo user_repositories.UserRepository
 }
 
-func NewUserController() *UserController {
-	return &UserController{}
+func NewUserController(
+	userRepo user_repositories.UserRepository,
+) *UserController {
+	return &UserController{userRepo}
 }
 
-func (uc *UserController) CreateUser(context *fiber.Ctx) error {
+func (uc *UserController) UpdateUser(context *gin.Context) {
 
-	var user domain.User
+	var user user_domain.User
 
-	if err := context.BodyParser(&user); err != nil {
-		return err
+	userID, err := strconv.ParseUint(context.Param("userId"), 10, 32)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
-	if err := uc.UserRepo.Create(user); err != nil {
-		return err
+	user.ID = uint(userID)
+
+	if err := context.BindJSON(&user); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
-	context.SendString(`{"data":"true"}`)
+	if err := uc.UserRepo.Update(user); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
-	return nil
+	context.JSON(http.StatusOK, gin.H{
+		"data": true,
+	})
 }
 
-func (uc *UserController) UpdateUser(context *fiber.Ctx) error {
-	return nil
+func (uc *UserController) GetUser(context *gin.Context) {
+	user, err := uc.UserRepo.FindById(context.Param("userId"))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"data": user,
+	})
 }
 
-func (uc *UserController) GetUser(context *fiber.Ctx) error {
-	return nil
-}
+func (uc *UserController) DeleteUser(context *gin.Context) {
 
-func (uc *UserController) DeleteUser(context *fiber.Ctx) error {
-	return nil
 }

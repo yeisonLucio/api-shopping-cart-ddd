@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/yeisonLucio/shopping-cart/src/components/products/domain"
 	"github.com/yeisonLucio/shopping-cart/src/components/products/domain/contracts/use_cases"
 )
@@ -16,94 +16,115 @@ type ProductController struct {
 	DeleteProductUC use_cases.DeleteProduct
 }
 
-func (pc *ProductController) GetAllProducts(context *fiber.Ctx) error {
+func (pc *ProductController) GetAllProducts(context *gin.Context) {
 
 	var filters domain.Filters
 
-	if err := context.QueryParser(&filters); err != nil {
-		return err
+	if err := context.Bind(&filters); err != nil {
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	products, err := pc.GetAllProductUC.Handler(filters)
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
-	context.JSON(products)
-	return nil
+	context.JSON(200, products)
 }
 
-func (pc *ProductController) GetProduct(context *fiber.Ctx) error {
+func (pc *ProductController) GetProduct(context *gin.Context) {
 
-	productID, err := strconv.ParseUint(context.Params("productId"), 10, 32)
+	productID, err := strconv.ParseUint(context.Param("productId"), 10, 32)
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	product, err := pc.GetProductUC.Handler(uint(productID))
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
-	context.JSON(product)
-	return nil
+	context.JSON(200, product)
 }
 
-func (pc *ProductController) NewProduct(context *fiber.Ctx) error {
+func (pc *ProductController) NewProduct(context *gin.Context) {
 
 	var product domain.Product
 
-	if err := context.BodyParser(&product); err != nil {
-		return err
+	if err := context.BindJSON(&product); err != nil {
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	_, err := pc.CreateProductUC.Handler(product)
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
-	context.SendString(`{"data":"true"}`)
+	context.JSON(200, gin.H{
+		"data": true,
+	})
 
-	return nil
 }
 
-func (pc *ProductController) UpdateProduct(context *fiber.Ctx) error {
+func (pc *ProductController) UpdateProduct(context *gin.Context) {
 	var product domain.Product
 
-	productID, err := strconv.ParseUint(context.Params("productId"), 10, 32)
+	productID, err := strconv.ParseUint(context.Param("productId"), 10, 32)
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	product.ID = uint(productID)
 
-	if err := context.BodyParser(&product); err != nil {
-		return err
+	if err := context.BindJSON(&product); err != nil {
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	if err := pc.UpdateProductUC.Handler(product); err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
-	context.SendString(`{"data":"true"}`)
-
-	return nil
+	context.JSON(200, gin.H{
+		"data": true,
+	})
 }
 
-func (pc *ProductController) DeleteProduct(context *fiber.Ctx) error {
+func (pc *ProductController) DeleteProduct(context *gin.Context) {
 
-	productID, err := strconv.ParseUint(context.Params("productId"), 10, 32)
+	productID, err := strconv.ParseUint(context.Param("productId"), 10, 32)
 	if err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
 	if err := pc.DeleteProductUC.Handler(uint(productID)); err != nil {
-		return err
+		context.JSON(500, gin.H{
+			"error": err.Error(),
+		})
 	}
 
-	context.SendString(`{"data":"true"}`)
-
-	return nil
+	context.JSON(200, gin.H{
+		"data": true,
+	})
 }
 
 func NewProductController(

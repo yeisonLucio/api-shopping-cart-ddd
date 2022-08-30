@@ -4,10 +4,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type App struct {
-	Host string `mapstructure:"MYSQL_HOST"`
-}
-
 func LoadConfig(
 	fileName string,
 	path string,

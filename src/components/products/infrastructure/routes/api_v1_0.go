@@ -1,7 +1,7 @@
-package routes
+package product_routes
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure"
 )
 
@@ -9,14 +9,14 @@ type ProductRoutesV1_0 struct {
 	productCTRL *infrastructure.ProductController
 }
 
-func (pr *ProductRoutesV1_0) SetRoutes(app *fiber.App) {
+func (pr *ProductRoutesV1_0) SetRoutes(app *gin.Engine) {
 
 	product := app.Group("api/v1.0/product")
-	product.Post("/", pr.productCTRL.NewProduct)
-	product.Get("/list", pr.productCTRL.GetAllProducts)
-	product.Get("/:productId", pr.productCTRL.GetProduct)
-	product.Put("/:productId", pr.productCTRL.UpdateProduct)
-	product.Delete("/:productId", pr.productCTRL.DeleteProduct)
+	product.POST("/", pr.productCTRL.NewProduct)
+	product.GET("/list", pr.productCTRL.GetAllProducts)
+	product.GET("/:productId", pr.productCTRL.GetProduct)
+	product.PUT("/:productId", pr.productCTRL.UpdateProduct)
+	product.DELETE("/:productId", pr.productCTRL.DeleteProduct)
 	//product.Put("/update-stock") toDo
 }
 

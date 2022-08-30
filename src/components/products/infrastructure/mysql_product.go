@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"github.com/yeisonLucio/shopping-cart/src/components/products/domain"
-	"github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure/orm"
+	product_orm "github.com/yeisonLucio/shopping-cart/src/components/products/infrastructure/orm"
 	"github.com/yeisonLucio/shopping-cart/src/database/connections"
 )
 
@@ -14,7 +14,7 @@ func NewMysqlProduct() *MysqlProduct {
 }
 
 func (mp *MysqlProduct) CreateProduct(product domain.Product) (bool, error) {
-	var newProduct orm.Product
+	var newProduct product_orm.Product
 
 	if err := product.Parse(&newProduct); err != nil {
 		return false, err
@@ -28,7 +28,7 @@ func (mp *MysqlProduct) CreateProduct(product domain.Product) (bool, error) {
 
 func (mp *MysqlProduct) GetProductById(productID uint) (domain.Product, error) {
 
-	var productDB orm.Product
+	var productDB product_orm.Product
 	var product domain.Product
 
 	if res := connections.DB.First(&productDB, productID); res.Error != nil {
@@ -44,7 +44,7 @@ func (mp *MysqlProduct) GetProductById(productID uint) (domain.Product, error) {
 
 func (mp *MysqlProduct) Save(product domain.Product) error {
 
-	var productToUpdate orm.Product
+	var productToUpdate product_orm.Product
 
 	if err := product.Parse(&productToUpdate); err != nil {
 		return err
@@ -77,5 +77,5 @@ func (mp *MysqlProduct) GetFilteredProducts(filters domain.Filters) ([]domain.Pr
 func (mp *MysqlProduct) DeleteProduct(productID uint) error {
 	return connections.DB.
 		Where("id = ?", productID).
-		Delete(&orm.Product{}).Error
+		Delete(&product_orm.Product{}).Error
 }

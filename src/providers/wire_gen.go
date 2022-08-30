@@ -8,8 +8,10 @@ package providers
 
 import (
 	"github.com/yeisonLucio/shopping-cart/src"
+	"github.com/yeisonLucio/shopping-cart/src/helpers"
 	"github.com/yeisonLucio/shopping-cart/src/providers/app"
 	"github.com/yeisonLucio/shopping-cart/src/providers/product"
+	"github.com/yeisonLucio/shopping-cart/src/providers/user"
 )
 
 // Injectors from wire.go:
@@ -23,7 +25,14 @@ func Initialize() *src.App {
 	deleteProduct := product.DeleteProductProvider(mysqlProduct)
 	productController := product.ProductControllerProvider(createProduct, getProduct, updateProduct, getAllProducts, deleteProduct)
 	productRoutesV1_0 := product.ProductRoutesProvider(productController)
-	routes := app.RoutesProvider(productRoutesV1_0)
+	mysqlUser := user.UserRepositoryProvider()
+	userController := user.UserControllerProvider(mysqlUser)
+	helpersHelpers := helpers.NewHelpers()
+	registerUserUC := user.RegisterUserUCProvider(helpersHelpers, mysqlUser)
+	loginUC := user.LoginUCProvider(helpersHelpers, mysqlUser)
+	authController := user.AuthControllerProvider(registerUserUC, loginUC)
+	userRoutesV1_0 := user.UserRoutesProvider(userController, authController)
+	routes := app.RoutesProvider(productRoutesV1_0, userRoutesV1_0)
 	srcApp := app.AppProvider(routes)
 	return srcApp
 }
